@@ -59,7 +59,7 @@ class SpringBootCrudExample2ApplicationTests {
     }
 
     @Test
-    @Sql(statements = "INSERT INTO PRODUCT_TBL(id,name, quantity,price)VALUES(1,'CAR', 1, 334000)",
+    @Sql(statements = "INSERT INTO PRODUCT_TBL(id,name, quantity,price)VALUES(2,'CAR', 1, 334000)",
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(statements = "DELETE FROM PRODUCT_TBL WHERE id=2", executionPhase =
             Sql.ExecutionPhase.AFTER_TEST_METHOD)
@@ -71,5 +71,19 @@ class SpringBootCrudExample2ApplicationTests {
                 },
                 () -> assertEquals("CAR", product.getName()));
     }
+
+    @Test
+    @Sql(statements = "INSERT INTO PRODUCT_TBL (id,name, quantity, price) VALUES (2,'shoes', 1, 999)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "DELETE FROM PRODUCT_TBL WHERE id=2", executionPhase =
+            Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void updateProductTest() {
+        Product product = new Product("shoes", 1, 1999);
+        restTemplate.put(baseUrl + "/update/{id}", product, 2);
+        Product productFromDb = h2Repository.findById(2).get();
+
+        assertAll(() -> assertNotNull(productFromDb),
+                () -> assertEquals(1999, productFromDb.getPrice()));
+    }
+
 
 }
